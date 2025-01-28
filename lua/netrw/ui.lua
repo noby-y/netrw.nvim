@@ -7,14 +7,20 @@ local get_icon = function(node)
 	local icon = ""
 	local hl_group = ""
 
-	if node.type == parse.TYPE_FILE then
+		if node.type == parse.TYPE_FILE or node.type == parse.TYPE_DIR then
 		icon = config.options.icons.file
 		if config.options.use_devicons then
 			local has_miniicons, miniicons = pcall(require, "mini.icons")
 			local has_devicons, devicons = pcall(require, "nvim-web-devicons")
 
 			if has_miniicons then
-				local ic, hi = miniicons.get("file", node.node)
+				local ic, hi
+				if node.type == parse.TYPE_FILE then
+					ic, hi = miniicons.get("file", node.node)
+				else
+					ic, hi = miniicons.get("directory", node.node)
+				end
+
 				if ic then
 					icon = ic
 					hl_group = hi
@@ -27,11 +33,10 @@ local get_icon = function(node)
 				end
 			end
 		end
-	elseif node.type == parse.TYPE_DIR then
-		icon = config.options.icons.directory
 	elseif node.type == parse.TYPE_SYMLINK then
 		icon = config.options.icons.symlink
 	end
+
 
 	return { icon, hl_group }
 end
